@@ -458,3 +458,35 @@ def export_data_as_csv(n_clicks):
     if ctx.triggered_id == 'avsb-csv-button':
         return True
     return False
+
+
+#!/usr/bin/env python3
+
+from time import time 
+from util.connections import read_yaml, postgres_db
+from util.logger import *
+import argparse
+import pandas as pd
+import  sys 
+
+sys.path.append('/datascience/dtu')
+
+import argparse 
+
+from utils.configuration import Configuration 
+
+import sys
+import connectorx as cx
+from s3fs import S3FileSystem
+
+s3 = S3FileSystem(anon=False)
+
+
+
+def nn_args (p):
+    p.add_argument("-l", "--logloc", default='/data/logs/', type=str, help="directory for log files")
+    p.add_argument("-y","--yamlConfigFile", default='/datascience/geo/dd_and_nn/config/bi.yaml', type=str, help="Yaml configuration file") 
+    p.add_argument("-n","--nnConfigFile", default='/datascience/geo/dd_and_nn/config/nn.yaml', type=str, help="nn configuration file") 
+    p.add_argument("--secretkeyfile", default='/secrets/.tdpasswordkey', type=str, help="secret password key file")
+    p.add_argument ("--database" , type=str, default='postgres',help="snowflake name ")
+    p.add_argument("nn_code", metavar="nearest_neighbor_code", nargs='+', type=str, help="the kind of nearest neighbor you want to perform")
