@@ -490,3 +490,15 @@ def nn_args (p):
     p.add_argument("--secretkeyfile", default='/secrets/.tdpasswordkey', type=str, help="secret password key file")
     p.add_argument ("--database" , type=str, default='postgres',help="snowflake name ")
     p.add_argument("nn_code", metavar="nearest_neighbor_code", nargs='+', type=str, help="the kind of nearest neighbor you want to perform")
+    
+    
+    import boto3
+import yaml
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-y", "--instanceConfig", default='uat.yaml', type=str, help="file path for instance config parameters")
+parser.add_argument("-a", "--action", type=str, help="instruction whether to start, stop or get the status of the instance: start, stop, status", required=True)
+
+args = parser.parse_args()
+action = args.action
