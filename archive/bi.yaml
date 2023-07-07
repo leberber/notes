@@ -1,0 +1,66 @@
+Contexts:
+      ##test (demo) databases
+      test_sqlite_sample:
+            driver: SQLITE
+            dbname: '/tmp/sample.db'
+      test_sqlite_new:
+            driver: SQLITE
+            dbname: '/tmp/new1.db'
+
+      #snowflake
+      snowflake_sandbox:
+            driver: SNOWFLAKE
+            account: ada71225.us-east-1
+            database: ADVNANALYTICTBLS
+            role: DEV_ADVN_ANALYTIC_ETL_DEV
+            warehouse: WH_ADV_DEV_ETL_DEV_XSMALL
+            user: ${PID} 
+            passwordfile: ~/.snowpassword 
+            schema: public
+
+      snowflake_dev:
+            driver: SNOWFLAKE
+            account: ada71225.us-east-1
+            database: ADV_DEV
+            role: DEV_ADV_ETL_DEV
+            warehouse: WH_ADV_DEV_ETL_DEV_LARGE
+            user: ${PID} 
+            passwordfile: ~/.snowpassword  
+ 
+      #Teradata
+      teradata_generic:
+            driver: TERADATA
+            host: '142.136.67.139'
+            user: SVC_XBI_PRD_R
+            passwordfile: ~/.tdpassword_SVC_XBI_PRD_R  
+      teradata_pid:
+            driver: TERADATA
+            host: '142.136.67.139'
+            user: ${PID}
+            passwordfile: ~/.tdpassword 
+            logmech: LDAP
+            database: DLBIAdvdAnltcs
+
+      #Postgres
+      pg_geodb:
+            driver: POSTGRES
+            host: '134.150.33.97'
+            user: postgres
+            dbname: geodb
+            port: 44444 
+            passwordfile: ~/.geodbpw
+
+      #parquet
+      parquet_test:
+            driver: PARQUET
+            base_dir: /tmp/parquet_test 
+ 
+Parameters:  
+      FiscalMonth: (202110,202111) 
+      sample_clause: 'DimAcctSk MOD 100=51' 
+      Begin_Date : "'1900-01-01'"
+      End_Date : "'2099-12-31'" 
+      snowflake_hlq: " " #snowflake high level qualifier
+      snowflake_context: "snowflake_sandbox"
+
+      

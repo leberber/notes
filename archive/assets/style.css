@@ -1,0 +1,19 @@
+/* .markercluster {
+    background-image: conic-gradient(red 0deg, red 90deg, yellow 90deg, green 270deg, blue 270deg);
+}
+
+@import url(https://fonts.googleapis.com/css?family=Montserrat:400);
+:root {
+    --shift-x: 0.25em
+}
+
+.chart-number {
+    font-size: 0.6em;
+    line-height: 1;
+    text-anchor: middle;
+    font-weight: bold;
+    -moz-transform: translateY(var(--shift-x));
+    -ms-transform: translateY(var(--shift-x));
+    -webkit-transform: translateY(var(--shift-x));
+    transform: translateY(var(--shift-x));
+} */
