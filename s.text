@@ -1,7 +1,1 @@
-WHERE 
-    AVGDNSTRMQAMUTLZN >= 0.243 
-AND AVGDNSTRMQAMUTLZN <= 0.95
-
-WHERE 
-          AVGDNSTRMQAMUTLZN > 0.0 
-AND AVGDNSTRMQAMUTLZN < 0.243
+I've performed an A/B Analysis comparing cohorts where the prediction curve is ascending and where it plateaus (refer to the screenshot below for A and B definitions). I'm investigating why the model associates a higher value for AVGDNSTRMQAMUTLZN with a reduced probability of requiring a truck roll.
