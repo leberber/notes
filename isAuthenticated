@@ -1,1 +1,1 @@
-{"user1": "True", "user2":"False"}
+{"user1": true, "user2":false}
