@@ -15,8 +15,8 @@ esso_uat = oauth.register(
     name='esso-uat',
     client_id='3f6732ba-e495-4829-8717-7a30c0cbebba',
     client_secret='YOUR_CLIENT_SECRET',  # Replace with the actual secret you receive
-    server_metadata_url='https://login.esso-uat.charter.com:8443/nidp/oauth/nam/.well-known/openid-configuration',
-    api_base_url='https://login.esso-uat.charter.com:8443/nidp/oauth/nam/',
+    authorize_url='https://login.esso-uat.charter.com:8443/nidp/oauth/nam/authz',
+    token_url='https://login.esso-uat.charter.com:8443/nidp/oauth/nam/token',
     client_kwargs={'scope': 'openid profile email sAMAccountName'}
 )
 
@@ -36,7 +36,8 @@ app.layout = html.Div([
 @server.route('/login')
 def login():
     esso_uat_client = oauth.create_client('esso-uat')
-    redirect_uri = url_for('authorize', _external=True)
+    # Ensure the redirect_uri is set to the registered one
+    redirect_uri = 'https://mituat.chartercom.com/authorize'
     return esso_uat_client.authorize_redirect(redirect_uri)
 
 @server.route('/authorize')
