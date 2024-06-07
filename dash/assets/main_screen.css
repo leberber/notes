@@ -1,0 +1,61 @@
+:root {
+    --image_with:70px;
+    --shadow_start:rgba(255, 255, 255, 0);
+    --shadow_end: rgb(255, 255, 255);
+  }
+
+.specialty{
+    border-radius: 10px;
+    width: auto;
+    padding: 10px;
+    margin:10px;
+    z-index:0;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 3px 10px;
+}
+.specialty-button{
+    border-radius: 10px;
+    /* border:2px solid red */
+}
+
+  
+.specialty-image {
+    width: var(--image_with);
+    z-index: 0;
+}
+
+.fade-shadow-right {
+    position: absolute;
+    top:0;
+    bottom: 0;
+    right: 0;
+    width: 70px;
+    background: linear-gradient(to right, var(--shadow_start) 0%, var(--shadow_end) 100%);
+    z-index: 100;
+}
+
+.fade-shadow-left {
+    position: absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    width: 70px;
+    background: linear-gradient(to left,  var(--shadow_start) 0%, var(--shadow_end) 100%);
+    z-index: 100;
+}
+
+
+
+.categories-container{
+    /* border:2px solid red; */
+    overflow: scroll;
+    display: flex;
+    padding: 25px;
+    z-index: 20;
+    /* position: relative; */
+    /* box-shadow: ; */
+    /* border: 1px solid red; */
+    /* box-shadow: inset 50px 0px 25px -25px rgb(226, 65, 65), inset -50px 0px 25px -25px rgba(240, 232, 232, 0.45); */
+    /* boxShadow: 10px 10px 50px; */
+
+}
+
