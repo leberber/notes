@@ -1,0 +1,134 @@
+from flask import Flask, redirect, url_for, session
+from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
+from authlib.integrations.flask_client import OAuth
+from dash import Dash, dcc, html, Input, Output
+import dash_bootstrap_components as dbc
+
+# Initialize Flask server
+server = Flask(__name__)
+server.secret_key = 'supersecretkey'
+
+# Initialize Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(server)
+login_manager.login_view = '/login'
+
+# User class
+class User(UserMixin):
+    def __init__(self, id):
+        self.id = id
+
+# User loader callback
+@login_manager.user_loader
+def load_user(user_id):
+    return User(user_id)
+
+# Initialize OAuth
+oauth = OAuth(server)
+google = oauth.register(
+    name='google',
+    client_id='YOUR_GOOGLE_CLIENT_ID',
+    client_secret='YOUR_GOOGLE_CLIENT_SECRET',
+    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+    client_kwargs={'scope': 'openid profile email'}
+)
+
+# Flask routes for OAuth
+@server.route('/login')
+def login():
+    redirect_uri = url_for('authorize', _external=True)
+    return google.authorize_redirect(redirect_uri)
+
+@server.route('/authorize')
+def authorize():
+    token = google.authorize_access_token()
+    resp = google.get('userinfo')
+    user_info = resp.json()
+    user = User(user_info['email'])
+    login_user(user)
+    return redirect('/')
+
+@server.route('/logout')
+def logout():
+    logout_user()
+    return redirect('/')
+
+# Initialize Dash app
+app = Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTSTRAP], use_pages=True)
+
+# Layout of the Dash app
+app.layout = html.Div([
+    dcc.Location(id='url', refresh=True),
+    html.Div(id='page-content')
+])
+
+login_page = html.Div([
+    dcc.Location(id='url_login', refresh=True),
+    html.H2('Please log in to continue:'),
+    html.Button('Login with Google', id='login-button', n_clicks=0),
+    html.Div(id='login-output')
+])
+
+home_page = html.Div([
+    html.H1('Welcome to the Home Page'),
+    dcc.Link('Go to Page 1', href='/page-1'),
+    html.Br(),
+    dcc.Link('Go to Page 2', href='/page-2'),
+    html.Br(),
+    html.Button('Logout', id='logout-button')
+])
+
+page_1_layout = html.Div([
+    html.H1('Welcome to Page 1'),
+    dcc.Link('Go to Home Page', href='/'),
+    html.Br(),
+    dcc.Link('Go to Page 2', href='/page-2')
+])
+
+page_2_layout = html.Div([
+    html.H1('Welcome to Page 2'),
+    dcc.Link('Go to Home Page', href='/'),
+    html.Br(),
+    dcc.Link('Go to Page 1', href='/page-1')
+])
+
+@app.callback(
+    Output('url', 'pathname'),
+    Input('login-button', 'n_clicks'),
+    prevent_initial_call=True
+)
+def login_redirect(n_clicks):
+    if n_clicks > 0:
+        return '/login'
+    return '/'
+
+@app.callback(
+    Output('url', 'pathname'),
+    Input('logout-button', 'n_clicks'),
+    prevent_initial_call=True
+)
+def logout_redirect(n_clicks):
+    if n_clicks > 0:
+        return '/logout'
+    return '/'
+
+@app.callback(
+    Output('page-content', 'children'),
+    Input('url', 'pathname')
+)
+def display_page(pathname):
+    if pathname == '/':
+        if current_user.is_authenticated:
+            return home_page
+        else:
+            return login_page
+    elif pathname == '/page-1':
+        return page_1_layout
+    elif pathname == '/page-2':
+        return page_2_layout
+    else:
+        return '404 Page Not Found'
+
+# Run the server
+if __name__ == '__main__':
+    app.run_server(debug=True)
