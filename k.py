@@ -1,3 +1,37 @@
+## Application Structure
+
+- **`app.py`**: Main application file that sets up the Dash and Flask server, routes, and callbacks.
+- **`components/header.py`**: Contains the header component for the app.
+- **`components/sidebar.py`**: Contains the sidebar component for the app.
+- **`utils/helpers.py`**: Utility functions used in the application.
+- **`appconfig.py`**: Configuration file for external stylesheets and other settings.
+- **`db.json`**: JSON file used as a simple database for storing user information.
+
+## OAuth Authentication
+
+To use OAuth authentication with Google, ensure you have registered your application with Google and obtained the client ID and client secret. These credentials should be added to your `.env` file as shown above.
+
+## Routes
+
+- **`/login`**: Handles user login via a POST request.
+- **`/register`**: Handles user registration via a POST request.
+- **`/signingoogle`**: Initiates Google OAuth login.
+- **`/authorize`**: Handles the callback from Google after authentication.
+
+## Callbacks
+
+### Python Callbacks
+
+- **`update_user_initials`**: Updates the user avatar and initials in the UI based on the current session state.
+
+### Clientside Callbacks
+
+- **`theme_switcher_callback`**: Toggles the theme between light and dark modes.
+- **`side_bar_toggle`**: Toggles the visibility of the sidebar.
+
+## Acknowledgments
+
+This code is influenced by Dash community member @jinnyzor's implementation of a login system with Flask, which can be found in this discussion: [Dash App Pages with Flask Login Flow](https://community.plotly.com/t/dash-app-pages-with-flask-login-flow-using-flask/69507).
 
 
 
