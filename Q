@@ -1,0 +1,7 @@
+SELECT COUNT(*) 
+FROM dlbiadvdanltcs.srm_model_data SRM
+JOIN (SELECT * FROM dlbiadvdanltcs."weekly_ds_us" LIMIT 100000000) UTI
+ON SRM.fibernode = UTI.intalias 
+AND UTI.summarydate >= SRM.CALDT_K 
+AND UTI.summarydate <= SRM.CALDT_K + INTERVAL '7 DAYS'
+GROUP BY UTI.summarydate
