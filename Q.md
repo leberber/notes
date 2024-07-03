@@ -13,3 +13,4 @@ Additionally, the join keys provided appear to be different. The node codes from
 Here are the details provided about the data:
 - The data represents node utilization for the prior week. For example, the record dated `'2024-01-07'` reflects the node utilization from `'2023-12-31'` to `'2024-01-07'`
 
+At this point, I'm unsure how to join the data correctly. Could you provide some guidance on this?
