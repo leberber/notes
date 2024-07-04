@@ -6,7 +6,8 @@ Please find the notes below regarding the state and progress of converting MIT t
    To make EIA work against Redshift, the following steps need to be completed:
 
    - **Transformation Script Modifications:**
-     - Modify the transformation script to work against Redshift. *In progress (estimated completion: end of day Friday)*
+     - Modify the transformation script to work against Redshift.
+       *In progress (estimated completion: end of day Friday)*
      - Update the SQL that generates the dependency views for the transformation script. *In progress (estimated completion: end of day Friday)*
      - Ensure the transformation script does not use schemas, as Redshift does not utilize schemas. *In progress (estimated completion: end of day Friday)*
      - Update the script that creates the EIA metadata table on which EIA relies. *In progress (estimated completion: end of day Friday)*
