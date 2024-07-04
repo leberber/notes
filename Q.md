@@ -1,42 +1,37 @@
-Hi Taavo,
-
-I hope this message finds you well. Please find below the notes regarding the state and progress of converting MIT to work against Redshift.
-
-### EIA
-To enable EIA to function with Redshift, the following steps are required:
-
-#### Transformation Script Modifications
-- **Modify the transformation script to work against Redshift.**  
-  *In progress (estimated completion: end of day Friday)*
-- **Update the SQL that generates the dependency views for the transformation script.**  
-  *In progress (estimated completion: end of day Friday)*
-- **Ensure the transformation script does not use schemas, as Redshift does not utilize schemas.**  
-  *In progress (estimated completion: end of day Friday)*
-- **Update the script that creates the EIA metadata table on which EIA relies.**  
-  *In progress (estimated completion: end of day Friday)*
-
-#### EIA App Modifications
-- **Change the connection from Snowflake to Redshift.**  
-  *Done*
-- **Update the SQL that generates the grids and lag charts to work against Redshift.**  
-  *Done (awaiting testing)*
-
-### Model Manager
-To ensure the Model Manager works with Redshift, the following tasks need to be completed:
-- **Update the modeling and scoring process to populate metadata tables in Redshift.**
-- **Update the Model Manager SQL to work against tables in Redshift.**
-
-### Model Interpreter
-- **Update the SQL that creates the charts and grids to work against Redshift.**  
-  *Note:* The SQL in this part of the app is still pointing to the SHAP tables, not the P-Allocs tables. Should I change this to work with P-Allocs? The current SQL may not work with Redshift.
-- **Perform testing.**
-
-### AvsB
-- **Update the SQL that creates the charts and grids to work against Redshift.**  
-  *Note:* The SQL in this part of the app is still pointing to the SHAP tables, not the P-Allocs tables. Should I change this to work with P-Allocs? The current SQL may not work with Redshift.
-
-Please let me know if you have any questions or need further details.
-
-Best regards,  
-[Your Name]
+    CREATE TABLE IF NOT EXISTS dlbiadvdanltcs.EIA_METADATA_COPY (
+        EVENT_NAME  TEXT,
+        DATES       TEXT,
+        EVENT_DATA  TEXT,
+        OPTIONS     TEXT,
+        SQL         TEXT)
+    
+INSERT INTO dlbiadvdanltcs.EIA_METADATA_COPY (EVENT_NAME, DATES, EVENT_DATA, OPTIONS, SQL)
+    SELECT 'SRM_ROUTER_FW_UPGRADE', 
+        '{"caldt": ["2024-01-04", "2024-06-05"], "min_caldt": "2024-01-04", "max_caldt": "2024-06-05", "evnt_dt": ["2023-12-21", "2024-06-19"], "min_evnt_dt": "2023-12-21", "max_evnt_dt": "2024-06-19"}',
+        '{"SCHEMA": "TBLS", "ACCT_COL": "DIMACCTSK", "DATE_COL": "TO_EFF_DT", "MODELS_LIST": ["SRM_RCS", "SRM_TR_ENTERED"], "INTERVALS": [[-14, -1], [0, 1], [2, 7], [8, 14]], "NEG_LAG_DAYS": 14, "POS_LAG_DAYS": 14, "CTE": false, "IS_ADJ": true, "EVENT_ACCT_JOINS": {"DIMCPESK_K": "R_DIMCPESK"}, "EVENT_ATTRIBUTES": {"FROM_FIRMWARE": "FROM FIRMWARE", "TO_FIRMWARE": "TO FIRMWARE", "TO_MODEL": "DEVICE MODEL"}, "DEFUALT_SELECTS": {"TO_FIRMWARE": "TO FIRMWARE"}, "ACCOUNT_ATTRIBUTES": {"DOORSBNDLCAT": "BUNDLE", "MARKET": "MARKET", "REGION": "REGION", "M_MFREQPNUM": "MODEM MODEL", "R_MFREQPNUM": "ROUTER MODEL", "HHAGEDESC": "HH AGE", "HIGH_SPLIT_PHASE_GROUP": "HIGH SPLIT PHASE GROUP", "CMTSMDLNM": "CMTS MODEL"}, "DATE_ATTRIBUTES": {"CALDT": "CALENDAR DATE", "EVNT_DT": "EVENT DATE", "LAG_DAYS": "LAG DAYS"}, "MODELS": {"SRM_RCS____WEEKLY_RELCAND_1": {"Repair Call": {"P": "Unadjusted", "P_ADJ_CMTS": "CMTS", "P_ADJ_MARKET": "Market", "P_ADJ_REGION": "Region", "Y": "Y", "Y_AXIS": 0.007}}, "SRM_TR_ENTERED____WEEKLY_RELCAND_1": {"Truck Roll TC Entered": {"P": "Unadjusted", "P_ADJ_CMTS": "CMTS", "P_ADJ_MARKET": "Market", "P_ADJ_REGION": "Region", "Y": "Y", "Y_AXIS": 0.002}}}}',
+        NULL,
+    '
+    CREATE TABLE dlbiadvdanltcs.EIA_SRM_ROUTER_FW_UPGRADE AS
+         SELECT 
+                 BD.CALDT_K as CALDT,
+                 CAST(EVNT.TO_EFF_DT AS DATE) as EVNT_DT,
+                 BD.CALDT_K - CAST(EVNT.TO_EFF_DT AS DATE) as LAG_DAYS,
+                 SRM_RCS____WEEKLY_RELCAND_1.P AS SRM_RCS____WEEKLY_RELCAND_1_P,
+                 SRM_RCS____WEEKLY_RELCAND_1.P_ADJ_CMTS AS SRM_RCS____WEEKLY_RELCAND_1_P_ADJ_CMTS,
+                 SRM_RCS____WEEKLY_RELCAND_1.P_ADJ_MARKET AS SRM_RCS____WEEKLY_RELCAND_1_P_ADJ_MARKET,
+                 SRM_RCS____WEEKLY_RELCAND_1.P_ADJ_REGION AS SRM_RCS____WEEKLY_RELCAND_1_P_ADJ_REGION,
+                 SRM_RCS____WEEKLY_RELCAND_1.Y AS SRM_RCS____WEEKLY_RELCAND_1_Y,
+                 SRM_TR_ENTERED____WEEKLY_RELCAND_1.P AS SRM_TR_ENTERED____WEEKLY_RELCAND_1_P,
+                 SRM_TR_ENTERED____WEEKLY_RELCAND_1.P_ADJ_CMTS AS SRM_TR_ENTERED____WEEKLY_RELCAND_1_P_ADJ_CMTS,
+                 SRM_TR_ENTERED____WEEKLY_RELCAND_1.P_ADJ_MARKET AS SRM_TR_ENTERED____WEEKLY_RELCAND_1_P_ADJ_MARKET,
+                 SRM_TR_ENTERED____WEEKLY_RELCAND_1.P_ADJ_REGION AS SRM_TR_ENTERED____WEEKLY_RELCAND_1_P_ADJ_REGION,
+                 SRM_TR_ENTERED____WEEKLY_RELCAND_1.Y AS SRM_TR_ENTERED____WEEKLY_RELCAND_1_Y,
+                 BD.DOORSBNDLCAT, BD.MARKET, BD.REGION, BD.M_MFREQPNUM, BD.R_MFREQPNUM, BD.HHAGEDESC, BD.HIGH_SPLIT_PHASE_GROUP, BD.CMTSMDLNM, 
+                 EVNT.FROM_FIRMWARE, EVNT.TO_FIRMWARE, EVNT.TO_MODEL
+         FROM  dlbiadvdanltcs.SRM_ROUTER_FW_UPGRADE EVNT
+         JOIN dlbiadvdanltcs.SRM_MODEL_DATA BD ON BD.DIMACCTSK_K = EVNT.DIMACCTSK AND BD.CALDT_K >= CAST(EVNT.TO_EFF_DT AS DATE) - 14 AND BD.CALDT_K <= CAST(EVNT.TO_EFF_DT AS DATE) + 14 AND EVNT.DIMCPESK_K = BD.R_DIMCPESK
+         JOIN dlbiadvdanltcs._SRM_RCS____WEEKLY_RELCAND_1_P_ADJ SRM_RCS____WEEKLY_RELCAND_1 ON SRM_RCS____WEEKLY_RELCAND_1._key = BD._key
+         JOIN dlbiadvdanltcs._SRM_TR_ENTERED____WEEKLY_RELCAND_1_P_ADJ SRM_TR_ENTERED____WEEKLY_RELCAND_1 ON SRM_TR_ENTERED____WEEKLY_RELCAND_1._key = BD._key
+         
+    '
 
