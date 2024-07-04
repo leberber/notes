@@ -1,16 +1,38 @@
 Hi Taavo,
 
-I have loaded the data into the `cbi_dev` database under the name `dlbiadvdanltcs.weekly_ds_us`.
+I hope this message finds you well. Please find below the notes regarding the state and progress of converting MIT to work against Redshift.
 
-Jason provided the join keys to `SRM_MODEL_DATA`:
-- `summarydate` and `intalias` from the blended utilization data
-- `caldt_k` and `fibenode` from the SRM model data
+### EIA
+To enable EIA to function with Redshift, the following steps are required:
 
-Initially, I noticed some duplicates, as shown below.
+#### Transformation Script Modifications
+- **Modify the transformation script to work against Redshift.**  
+  *In progress (estimated completion: end of day Friday)*
+- **Update the SQL that generates the dependency views for the transformation script.**  
+  *In progress (estimated completion: end of day Friday)*
+- **Ensure the transformation script does not use schemas, as Redshift does not utilize schemas.**  
+  *In progress (estimated completion: end of day Friday)*
+- **Update the script that creates the EIA metadata table on which EIA relies.**  
+  *In progress (estimated completion: end of day Friday)*
 
-Additionally, the join keys provided appear to be different. The node codes from the utilization data vary: some records have multiple nodes either concatenated, separated by commas, or by slashes.
+#### EIA App Modifications
+- **Change the connection from Snowflake to Redshift.**  
+  *Done*
+- **Update the SQL that generates the grids and lag charts to work against Redshift.**  
+  *Done (awaiting testing)*
 
-Here are the details provided about the data:
-- The data represents node utilization for the prior week. For example, the record dated `'2024-01-07'` reflects the node utilization from `'2023-12-31'` to `'2024-01-07'`
+### Model Manager
+To ensure the Model Manager works with Redshift, the following tasks need to be completed:
+- **Update the modeling and scoring process to populate metadata tables in Redshift.**
+- **Update the Model Manager SQL to work against tables in Redshift.**
 
-At this point, I'm unsure how to join the data correctly. Could you provide some guidance on this?
+### Model Interpreter
+- **Update the SQL that creates the charts and grids to work against Redshift.**  
+  *Note:* The SQL in this part of the app is still pointing to the SHAP tables, not the P-Allocs tables. Should I change this to work with P-Allocs? The current SQL may not work with Redshift.
+- **Perform testing.**
+
+### AvsB
+- **Update the SQL that creates the charts and grids to work against Redshift.**  
+  *Note:* The SQL in this part of the app is still pointing to the SHAP tables, not the P-Allocs tables. Should I change this to work with P-Allocs? The current SQL may not work with Redshift.
+
+Please let me know if you have any questions or need further details.
