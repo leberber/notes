@@ -1,37 +1,34 @@
-    CREATE TABLE IF NOT EXISTS dlbiadvdanltcs.EIA_METADATA_COPY (
-        EVENT_NAME  TEXT,
-        DATES       TEXT,
-        EVENT_DATA  TEXT,
-        OPTIONS     TEXT,
-        SQL         TEXT)
-    
-INSERT INTO dlbiadvdanltcs.EIA_METADATA_COPY (EVENT_NAME, DATES, EVENT_DATA, OPTIONS, SQL)
-    SELECT 'SRM_ROUTER_FW_UPGRADE', 
-        '{"caldt": ["2024-01-04", "2024-06-05"], "min_caldt": "2024-01-04", "max_caldt": "2024-06-05", "evnt_dt": ["2023-12-21", "2024-06-19"], "min_evnt_dt": "2023-12-21", "max_evnt_dt": "2024-06-19"}',
-        '{"SCHEMA": "TBLS", "ACCT_COL": "DIMACCTSK", "DATE_COL": "TO_EFF_DT", "MODELS_LIST": ["SRM_RCS", "SRM_TR_ENTERED"], "INTERVALS": [[-14, -1], [0, 1], [2, 7], [8, 14]], "NEG_LAG_DAYS": 14, "POS_LAG_DAYS": 14, "CTE": false, "IS_ADJ": true, "EVENT_ACCT_JOINS": {"DIMCPESK_K": "R_DIMCPESK"}, "EVENT_ATTRIBUTES": {"FROM_FIRMWARE": "FROM FIRMWARE", "TO_FIRMWARE": "TO FIRMWARE", "TO_MODEL": "DEVICE MODEL"}, "DEFUALT_SELECTS": {"TO_FIRMWARE": "TO FIRMWARE"}, "ACCOUNT_ATTRIBUTES": {"DOORSBNDLCAT": "BUNDLE", "MARKET": "MARKET", "REGION": "REGION", "M_MFREQPNUM": "MODEM MODEL", "R_MFREQPNUM": "ROUTER MODEL", "HHAGEDESC": "HH AGE", "HIGH_SPLIT_PHASE_GROUP": "HIGH SPLIT PHASE GROUP", "CMTSMDLNM": "CMTS MODEL"}, "DATE_ATTRIBUTES": {"CALDT": "CALENDAR DATE", "EVNT_DT": "EVENT DATE", "LAG_DAYS": "LAG DAYS"}, "MODELS": {"SRM_RCS____WEEKLY_RELCAND_1": {"Repair Call": {"P": "Unadjusted", "P_ADJ_CMTS": "CMTS", "P_ADJ_MARKET": "Market", "P_ADJ_REGION": "Region", "Y": "Y", "Y_AXIS": 0.007}}, "SRM_TR_ENTERED____WEEKLY_RELCAND_1": {"Truck Roll TC Entered": {"P": "Unadjusted", "P_ADJ_CMTS": "CMTS", "P_ADJ_MARKET": "Market", "P_ADJ_REGION": "Region", "Y": "Y", "Y_AXIS": 0.002}}}}',
-        NULL,
-    '
-    CREATE TABLE dlbiadvdanltcs.EIA_SRM_ROUTER_FW_UPGRADE AS
-         SELECT 
-                 BD.CALDT_K as CALDT,
-                 CAST(EVNT.TO_EFF_DT AS DATE) as EVNT_DT,
-                 BD.CALDT_K - CAST(EVNT.TO_EFF_DT AS DATE) as LAG_DAYS,
-                 SRM_RCS____WEEKLY_RELCAND_1.P AS SRM_RCS____WEEKLY_RELCAND_1_P,
-                 SRM_RCS____WEEKLY_RELCAND_1.P_ADJ_CMTS AS SRM_RCS____WEEKLY_RELCAND_1_P_ADJ_CMTS,
-                 SRM_RCS____WEEKLY_RELCAND_1.P_ADJ_MARKET AS SRM_RCS____WEEKLY_RELCAND_1_P_ADJ_MARKET,
-                 SRM_RCS____WEEKLY_RELCAND_1.P_ADJ_REGION AS SRM_RCS____WEEKLY_RELCAND_1_P_ADJ_REGION,
-                 SRM_RCS____WEEKLY_RELCAND_1.Y AS SRM_RCS____WEEKLY_RELCAND_1_Y,
-                 SRM_TR_ENTERED____WEEKLY_RELCAND_1.P AS SRM_TR_ENTERED____WEEKLY_RELCAND_1_P,
-                 SRM_TR_ENTERED____WEEKLY_RELCAND_1.P_ADJ_CMTS AS SRM_TR_ENTERED____WEEKLY_RELCAND_1_P_ADJ_CMTS,
-                 SRM_TR_ENTERED____WEEKLY_RELCAND_1.P_ADJ_MARKET AS SRM_TR_ENTERED____WEEKLY_RELCAND_1_P_ADJ_MARKET,
-                 SRM_TR_ENTERED____WEEKLY_RELCAND_1.P_ADJ_REGION AS SRM_TR_ENTERED____WEEKLY_RELCAND_1_P_ADJ_REGION,
-                 SRM_TR_ENTERED____WEEKLY_RELCAND_1.Y AS SRM_TR_ENTERED____WEEKLY_RELCAND_1_Y,
-                 BD.DOORSBNDLCAT, BD.MARKET, BD.REGION, BD.M_MFREQPNUM, BD.R_MFREQPNUM, BD.HHAGEDESC, BD.HIGH_SPLIT_PHASE_GROUP, BD.CMTSMDLNM, 
-                 EVNT.FROM_FIRMWARE, EVNT.TO_FIRMWARE, EVNT.TO_MODEL
-         FROM  dlbiadvdanltcs.SRM_ROUTER_FW_UPGRADE EVNT
-         JOIN dlbiadvdanltcs.SRM_MODEL_DATA BD ON BD.DIMACCTSK_K = EVNT.DIMACCTSK AND BD.CALDT_K >= CAST(EVNT.TO_EFF_DT AS DATE) - 14 AND BD.CALDT_K <= CAST(EVNT.TO_EFF_DT AS DATE) + 14 AND EVNT.DIMCPESK_K = BD.R_DIMCPESK
-         JOIN dlbiadvdanltcs._SRM_RCS____WEEKLY_RELCAND_1_P_ADJ SRM_RCS____WEEKLY_RELCAND_1 ON SRM_RCS____WEEKLY_RELCAND_1._key = BD._key
-         JOIN dlbiadvdanltcs._SRM_TR_ENTERED____WEEKLY_RELCAND_1_P_ADJ SRM_TR_ENTERED____WEEKLY_RELCAND_1 ON SRM_TR_ENTERED____WEEKLY_RELCAND_1._key = BD._key
-         
-    '
+Geo UAT Server and Weather Data
+
+Background:
+At the start of the week, we encountered a space issue with PostgreSQL on the Geo UAT server. Although I was able to load small datasets into the database, any dataset larger than 1.5 gigabytes could not be loaded due to insufficient storage space.
+
+Resolution:
+We met with AWS support to address the storage issue. After their assistance, we successfully resolved the storage constraints and were able to load large datasets without any problems.
+
+New Issues:
+However, fixing the storage issue led to new problems with Docker permissions. Attempts to resolve these Docker permission issues further destabilized the server, rendering it unusable. I could not even build a Docker image after these complications.
+
+Interim Solution:
+When the Geo UAT server became unusable, I switched to the GEO Prod server, an adhoc server that requires manual intervention to start PostgreSQL. With Shiv's assistance, we successfully started PostgreSQL on the GEO Prod server. Despite its limited storage, I wrote a Python script to process and run the Nearest Neighbour analysis for 1% of the data at a time. This approach allowed me to obtain results for all the SRM subscribers.
+
+Nearest Neighbour Configuration:
+I configured the nearest weather station search for each subscriber in the srm_model_data table for the date of 2024-06-01, considering a radius of 50,000 meters (~30 miles).
+
+Results:
+Out of 26,272,931 subscribers, 25,096,683 were within the 30-mile radius and were successfully matched with a weather station.
+
+the nn results are in `dlbiadvdanltcs.nn_srm_weather_stations`
+Table Creation in Redshift:
+I created a table in Redshift to store the nearest weather station data for SRM subscribers.
+```
+CREATE TABLE dlbiadvdanltcs.nn_srm_weather_stations (
+    dimsvcunitsk INT, -- SRM JOIN KEY
+    station VARCHAR(150), -- WEATHER STATION JOIN KEY
+    d_meters INT, -- DISTANCE IN METERS BETWEEN THE SUBSCRIBER AND THE NEAREST WEATHER STATION
+    pt_srm VARCHAR(150), -- SUBSCRIBER LOCATION GEOMETRY FOR MAPPING
+    pt_station VARCHAR(150) -- LOCATION OF CLOSEST WEATHER STATION FOR MAPPING
+);
+```
+
 
